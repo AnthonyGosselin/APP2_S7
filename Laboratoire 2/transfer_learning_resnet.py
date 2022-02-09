@@ -55,7 +55,7 @@ if __name__ == '__main__':
                   'shuffle': True,
                   'num_workers': num_workers}
 
-    dataset_trainval = VOCClassificationDataset(data_path, image_set='train', download=True, img_shape=input_size)
+    dataset_trainval = VOCClassificationDataset(data_path, image_set='train', download=False, img_shape=input_size)
 
     # Séparation du dataset (entraînement et validation)
     dataset_train, dataset_val = torch.utils.data.random_split(dataset_trainval,
@@ -131,6 +131,10 @@ if __name__ == '__main__':
         thresholds = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         # ------------------------ Laboratoire 2 - Question 3 - Début de la section à compléter ----------------
 
+        target_true = 0
+        predicted_true = 0
+        correct_true = 0
+        roc_points = [[None, None] for _ in range(len(thresholds))]
         with torch.no_grad():
             for data, target in val_loader:
                 data, target = data.to(device), target.to(device)
@@ -138,7 +142,59 @@ if __name__ == '__main__':
                 loss = criterion(output, target)
                 val_loss += loss.item()
 
-            # ------------------------ Laboratoire 2 - Question 3 - Début de la section à compléter ----------------
+                for th_idx, thresh in enumerate(thresholds):
+                    predicted = output >= thresh
+                    target_classes = target
+
+                    # TP + FN:
+                    target_true += torch.sum(target_classes, dim=1).float()
+                    # TP + FP:
+                    predicted_true += torch.sum(predicted >= thresh, dim=1).float()
+                    # TP:
+                    correct_true += torch.sum(predicted == target_classes, dim=1).float()
+
+                    recall = correct_true / target_true
+                    precision = correct_true / predicted_true
+                    roc_points[th_idx][0] += recall
+                    roc_points[th_idx][1] += precision
+
+        # Get average of recall and precision
+        for i, point in enumerate(roc_points):
+            recall, precision = point
+            roc_points[i] = (recall/val_test_batch_size, precision/val_test_batch_size)
+
+
+
+        # Calculate AUC for all ROC curves per class
+        auc_all = []
+        for c in num_classes:
+            auc_class = 0
+            for t in range(len(thresholds)):
+                if t == 0:
+                    continue
+
+                precision = roc_points[t][1][c]
+
+                recall = roc_points[t][0][c]
+                prev_recall = roc_points[t-1][0][c]
+                prev_distance = np.abs(recall - prev_recall) / 2
+                next_distance = 0
+
+                if t != len(thresholds)-1:
+                    next_recall = roc_points[t + 1][0][c]
+                    next_distance = np.abs(recall - next_recall) / 2
+
+                x_distance = prev_distance + next_distance
+
+                auc_partial = x_distance * precision
+                auc_class += auc_partial
+            auc_all.append(auc_class)
+
+            print(f'mAP for class {dataset_trainval.VOC_ID_2_CLASSES}: {auc_class}')
+        print(f'mAP total: {np.sum(auc_all)}')
+
+
+        # ------------------------ Laboratoire 2 - Question 3 - Début de la section à compléter ----------------
 
         # Historique des coûts de validation
         val_loss /= len(val_loader)

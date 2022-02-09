@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torchvision
 
 # Module du dataset
 from voc_classification_dataset import VOCClassificationDataset
@@ -73,7 +74,18 @@ if __name__ == '__main__':
 
     # ------------------------ Laboratoire 2 - Question 2 - Début de la section à compléter ----------------------------
     # Chargement du modèle
+    model = torchvision.models.resnet18(pretrained=True, progress=True)
+    for param in model.parameters():
+        param.requires_grad = False
 
+    model.fc.requires_grad_(True)
+
+    model = nn.Sequential(
+        model,
+        nn.ReLU(),
+        nn.Linear(in_features=1000, out_features=dataset_trainval.nb_classe, device=device),
+        nn.Sigmoid()
+    )
     # ------------------------ Laboratoire 2 - Question 2 - Fin de la section à compléter ------------------------------
 
     model.to(device)

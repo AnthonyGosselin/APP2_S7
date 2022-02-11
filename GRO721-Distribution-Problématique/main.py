@@ -247,8 +247,23 @@ class ConveyorCnnTrainer():
         :return: La valeur de la fonction de coût pour le lot
         """
 
-        # À compléter
-        raise NotImplementedError()
+        if task == "classification":
+            target = class_labels
+        elif task == "detection":
+            target = boxes
+        elif task == "segmentation":
+            target = segmentation_target
+        else:
+            raise ValueError('Not supported task')
+
+        optimizer.zero_grad()
+        output = model(image)
+        loss = criterion(output, target)
+        metric.accumulate(output, target)
+        loss.backward()
+        optimizer.step()
+
+        return loss
 
     def _test_batch(self, task, model, criterion, metric, image, segmentation_target, boxes, class_labels):
         """

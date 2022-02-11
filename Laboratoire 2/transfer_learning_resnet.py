@@ -117,7 +117,7 @@ if __name__ == '__main__':
             optimizer.step()
 
             # Affichage pendant l'entraînement
-            if batch_idx % 10 == 0:
+            if batch_idx % 1 == 0:
                 print('Train - Epoch: {}/{} [{}/{} ({:.0f}%)] Average Loss: {:.6f}'.format(
                     epoch, epochs, batch_idx * len(data), len(train_loader.dataset),
                                    100. * batch_idx / len(train_loader), running_loss / (batch_idx + 1)), end='\r')
@@ -156,6 +156,7 @@ if __name__ == '__main__':
 
                     recall = correct_true / target_true
                     precision = correct_true / predicted_true
+                    precision = torch.nan_to_num(precision, 1)
                     roc_points[th_idx][0] += recall
                     roc_points[th_idx][1] += precision
 
@@ -192,7 +193,7 @@ if __name__ == '__main__':
             auc_all.append(auc_class)
 
             print(f'mAP for class {dataset_trainval.VOC_ID_2_CLASSES[c]}: {auc_class}')
-        print(f'mAP total: {np.sum(auc_all)}')
+        print(f'mAP total: {np.mean(auc_all)}')
 
 
         # ------------------------ Laboratoire 2 - Question 3 - Début de la section à compléter ----------------

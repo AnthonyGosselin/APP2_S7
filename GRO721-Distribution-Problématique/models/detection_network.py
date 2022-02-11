@@ -15,3 +15,10 @@ class DetectionNetwork(nn.Module):
         output = None
 
         return output
+
+
+def FixedPredictorDetectionNetworkLoss():
+    raise NotImplementedError()
+
+def DetectionNetworkLoss():
+    raise NotImplementedError()

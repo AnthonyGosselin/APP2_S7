@@ -12,6 +12,7 @@ from metrics import AccuracyMetric, MeanAveragePrecisionMetric, SegmentationInte
 from visualizer import Visualizer
 
 from models import ClassificationNetwork, DetectionNetwork, SegmentationNetwork
+from models import FixedPredictorDetectionNetworkLoss, DetectionNetworkLoss
 
 TRAIN_VALIDATION_SPLIT = 0.9
 CLASS_PROBABILITY_THRESHOLD = 0.5
@@ -48,8 +49,7 @@ class ConveyorCnnTrainer():
         if task == 'classification':
             model = ClassificationNetwork(in_channels=1, n_classes=3)
         elif task == 'detection':
-            # À compléter
-            raise NotImplementedError()
+            model = DetectionNetwork(in_channels=1, n_params=3)
         elif task == 'segmentation':
             # À compléter
             raise NotImplementedError()
@@ -62,8 +62,7 @@ class ConveyorCnnTrainer():
         if task == 'classification':
             loss_criterion = torch.nn.CrossEntropyLoss(reduction='mean')
         elif task == 'detection':
-            # À compléter
-            raise NotImplementedError()
+            loss_criterion = DetectionNetworkLoss
         elif task == 'segmentation':
             # À compléter
             raise NotImplementedError()

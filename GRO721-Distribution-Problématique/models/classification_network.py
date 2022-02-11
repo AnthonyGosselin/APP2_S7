@@ -27,13 +27,18 @@ class ClassificationNetwork(nn.Module):
         )
         # 32 x 26 x 26
 
+        self.res_conv0 = nn.Sequential(
+            nn.Conv2d(in_channels=in_channels, out_channels=64, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(num_features=64),
+        )
+
         in_channels = out_channels
         out_channels = 64
         self.conv2 = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(num_features=out_channels),
-            nn.ReLU(),
         )
+        self.relu2 = nn.ReLU()
         # 64 x 13 x 13
 
         in_channels = out_channels
@@ -43,15 +48,20 @@ class ClassificationNetwork(nn.Module):
             nn.BatchNorm2d(num_features=out_channels),
             nn.ReLU(),
         )
-        # 128 x 13 x 13
+        # 128 x 13 x 13I
+
+        self.res_conv2 = nn.Sequential(
+            nn.Conv2d(in_channels=in_channels, out_channels=64, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(num_features=64),
+        )
 
         in_channels = out_channels
         out_channels = 64
         self.conv4 = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(num_features=out_channels),
-            nn.ReLU(),
         )
+        self.relu4 = nn.ReLU()
         # 64 x 7 x 7
 
         in_channels = out_channels
@@ -63,13 +73,18 @@ class ClassificationNetwork(nn.Module):
         )
         # 32 x 7 x 7
 
+        self.res_conv4 = nn.Sequential(
+            nn.Conv2d(in_channels=in_channels, out_channels=16, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(num_features=16),
+        )
+
         in_channels = out_channels
         out_channels = 16
         self.conv6 = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(num_features=out_channels),
-            nn.ReLU(),
         )
+        self.relu6 = nn.ReLU()
         # 16 x 7 x 7
 
         self.avg_pool = nn.AvgPool2d(kernel_size=7, stride=1, padding=0)
@@ -83,15 +98,27 @@ class ClassificationNetwork(nn.Module):
         
         x = self.conv0(x)
         x = self.max_pool(x)
+        x1 = x
 
         x = self.conv1(x)
         x = self.conv2(x)
-        x = self.conv3(x)
-        x = self.conv4(x)
-        x = self.conv5(x)
-        x = self.conv6(x)
+        x1 = self.res_conv0(x1)
+        x = x + x1
+        x2 = self.relu2(x)
 
-        x = self.avg_pool(x)
+        x = self.conv3(x2)
+        x = self.conv4(x)
+        x2 = self.res_conv2(x2)
+        x = x + x2
+        x3 = self.relu4(x)
+
+        x = self.conv5(x3)
+        x = self.conv6(x)
+        x3 = self.res_conv4(x3)
+        x = x + x3
+        x4 = self.relu6(x)
+
+        x = self.avg_pool(x4)
 
         x = x.view(x.shape[0], -1)
         x = self.fc(x)

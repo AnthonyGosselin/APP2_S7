@@ -53,7 +53,8 @@ if __name__ == '__main__':
 
     params_val = {'batch_size': val_test_batch_size,
                   'shuffle': True,
-                  'num_workers': num_workers}
+                  'num_workers': num_workers,
+                  'drop_last': True}
 
     dataset_trainval = VOCClassificationDataset(data_path, image_set='train', download=False, img_shape=input_size)
 
@@ -134,7 +135,7 @@ if __name__ == '__main__':
         target_true = 0
         predicted_true = 0
         correct_true = 0
-        roc_points = [[None, None] for _ in range(len(thresholds))]
+        roc_points = [[0, 0] for _ in range(len(thresholds))]
         with torch.no_grad():
             for data, target in val_loader:
                 data, target = data.to(device), target.to(device)
@@ -167,7 +168,7 @@ if __name__ == '__main__':
 
         # Calculate AUC for all ROC curves per class
         auc_all = []
-        for c in num_classes:
+        for c in range(num_classes):
             auc_class = 0
             for t in range(len(thresholds)):
                 if t == 0:
@@ -190,7 +191,7 @@ if __name__ == '__main__':
                 auc_class += auc_partial
             auc_all.append(auc_class)
 
-            print(f'mAP for class {dataset_trainval.VOC_ID_2_CLASSES}: {auc_class}')
+            print(f'mAP for class {dataset_trainval.VOC_ID_2_CLASSES[c]}: {auc_class}')
         print(f'mAP total: {np.sum(auc_all)}')
 
 

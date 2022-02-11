@@ -24,7 +24,7 @@ input_channels = 3  # Nombre de canaux d'entree
 num_classes = 21  # Nombre de classes
 batch_size = 32  # Taille des lots pour l'entraînement
 val_test_batch_size = 32  # Taille des lots pour validation et test
-epochs = 2  # Nombre d'itérations (epochs)
+epochs = 5  # Nombre d'itérations (epochs)
 train_val_split = 0.8  # Proportion d'échantillons
 lr = 0.0001  # Taux d'apprentissage
 random_seed = 1  # Pour la répétabilité
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     model = nn.Sequential(
         model,
-        nn.ReLU(),
+        # nn.ReLU(),
         nn.Linear(in_features=1000, out_features=dataset_trainval.nb_classe, device=device),
         nn.Sigmoid()
     )
@@ -132,9 +132,9 @@ if __name__ == '__main__':
         thresholds = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         # ------------------------ Laboratoire 2 - Question 3 - Début de la section à compléter ----------------
 
-        target_true = 0
-        predicted_true = 0
-        correct_true = 0
+        # target_true = 0
+        # predicted_true = 0
+        # correct_true = 0
         roc_points = [[0, 0] for _ in range(len(thresholds))]
         with torch.no_grad():
             for data, target in val_loader:
@@ -148,13 +148,14 @@ if __name__ == '__main__':
                     target_classes = target
 
                     # TP + FN:
-                    target_true += torch.sum(target_classes, dim=1).float()
+                    target_true = torch.sum(target_classes, dim=0).float()
                     # TP + FP:
-                    predicted_true += torch.sum(predicted >= thresh, dim=1).float()
+                    predicted_true = torch.sum(predicted, dim=0).float()
                     # TP:
-                    correct_true += torch.sum(predicted == target_classes, dim=1).float()
+                    correct_true = torch.sum(predicted == target_classes, dim=0).float()
 
                     recall = correct_true / target_true
+                    recall = torch.nan_to_num(recall, 1)
                     precision = correct_true / predicted_true
                     precision = torch.nan_to_num(precision, 1)
                     roc_points[th_idx][0] += recall
@@ -164,8 +165,6 @@ if __name__ == '__main__':
         for i, point in enumerate(roc_points):
             recall, precision = point
             roc_points[i] = (recall/val_test_batch_size, precision/val_test_batch_size)
-
-
 
         # Calculate AUC for all ROC curves per class
         auc_all = []

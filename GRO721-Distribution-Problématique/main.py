@@ -11,6 +11,8 @@ from dataset import ConveyorSimulator
 from metrics import AccuracyMetric, MeanAveragePrecisionMetric, SegmentationIntersectionOverUnionMetric
 from visualizer import Visualizer
 
+from models import ClassificationNetwork, DetectionNetwork, SegmentationNetwork
+
 TRAIN_VALIDATION_SPLIT = 0.9
 CLASS_PROBABILITY_THRESHOLD = 0.5
 INTERSECTION_OVER_UNION_THRESHOLD = 0.5
@@ -44,8 +46,7 @@ class ConveyorCnnTrainer():
 
     def _create_model(self, task):
         if task == 'classification':
-            # À compléter
-            raise NotImplementedError()
+            model = ClassificationNetwork(in_channels=1, n_classes=3)
         elif task == 'detection':
             # À compléter
             raise NotImplementedError()
@@ -55,10 +56,11 @@ class ConveyorCnnTrainer():
         else:
             raise ValueError('Not supported task')
 
+        return model
+
     def _create_criterion(self, task):
         if task == 'classification':
-            # À compléter
-            raise NotImplementedError()
+            loss_criterion = torch.nn.CrossEntropyLoss(reduction='mean')
         elif task == 'detection':
             # À compléter
             raise NotImplementedError()
@@ -67,6 +69,8 @@ class ConveyorCnnTrainer():
             raise NotImplementedError()
         else:
             raise ValueError('Not supported task')
+
+        return loss_criterion
 
     def _create_metric(self, task):
         if task == 'classification':
@@ -204,7 +208,7 @@ class ConveyorCnnTrainer():
                                             epochs_train_metrics, epochs_validation_metrics,
                                             train_metric.get_name())
 
-        ans = input('Do you want ot test? (y/n):')
+        ans = input('Do you want to test? (y/n):')
         if ans == 'y':
             self.test()
 
@@ -303,8 +307,20 @@ class ConveyorCnnTrainer():
         :return: La valeur de la fonction de coût pour le lot
         """
 
-        # À compléter
-        raise NotImplementedError()
+        if task == "classification":
+            target = class_labels
+        elif task == "detection":
+            target = boxes
+        elif task == "segmentation":
+            target = segmentation_target
+        else:
+            raise ValueError('Not supported task')
+
+        output = model(image)
+        loss = criterion(output, target)
+        metric.accumulate(output, target)
+
+        return loss
 
 
 if __name__ == '__main__':

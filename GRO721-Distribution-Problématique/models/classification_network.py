@@ -81,7 +81,23 @@ class ClassificationNetwork(nn.Module):
 
     def forward(self, x):
         
-        # À compléter
-        output = None
+        x = self.conv0(x)
+        x = self.max_pool(x)
+
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        x = self.conv4(x)
+        x = self.conv5(x)
+        x = self.conv6(x)
+
+        x = self.avg_pool(x)
+
+        x = x.view(x.shape[0], -1)
+        x = self.fc(x)
+        x = self.sigmoid1(x)
+
+        output = x
 
         return output
+

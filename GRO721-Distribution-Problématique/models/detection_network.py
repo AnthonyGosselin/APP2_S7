@@ -5,6 +5,7 @@ import torchvision.transforms
 import numpy as np
 
 N_BOITES = 4
+WIDTH = 53
 
 class DetectionNetwork(nn.Module):
     def __init__(self, in_channels, n_params):
@@ -158,8 +159,50 @@ class DetectionNetwork(nn.Module):
         return output
 
     @staticmethod
-    def get_BBs():
-        pass
+    def get_BBs(prediction):
+        """
+        :param prediction:
+        (9 * 4 * 4)
+
+        [
+        [],
+        [...].
+        ...x9
+        ]
+
+        ...
+        (4 x 4 x 9)
+        box coordinates: scaled to total image size
+        :return:
+
+        global bboxes... after non-max suppression
+        """
+
+        # Resize to have the information separated by boxelet
+        # Information (size: 9): [pres, x_c, y_c, s, [4:8]: class multi-hot]]
+        prediction = prediction.reshape(N_BOITES, N_BOITES, -1)
+
+        CELL_WIDTH = WIDTH//N_BOITES
+
+        # Convert predicted cell boxes to big boxes coordinates
+        all_bboxes = []
+        for i, row_cellboxes in enumerate(prediction):
+            base_y = CELL_WIDTH * i
+            for j, cellbox_pred in enumerate(row_cellboxes):
+                # [pres_confiance, x_c, y_c, s, [4:8]: class multi-hot]]
+                base_x = CELL_WIDTH * j
+
+                x_global = int(base_x + cellbox_pred[1] * CELL_WIDTH)
+                y_global = int(base_y + cellbox_pred[2] * CELL_WIDTH)
+
+                converted_pred = cellbox_pred.clone()  # TODO: Need to clone?
+                converted_pred[1] = x_global
+                converted_pred[2] = y_global
+                all_bboxes.append(converted_pred)
+
+        # TODO: apply non-max suppression to only keep relevant bboxes
+        # all_bboxes...
+
 
 
 
@@ -223,12 +266,13 @@ def DetectionNetworkLoss(prediction, target):
 
         boxlet_target_array = np.zeros((N_BOITES,N_BOITES))
 
+        # TODO: This might have to be two for loops: cannot guarantee that len(pred_BBS) == len(tar)
         for pred_shape, tar_shape in zip(pred_BBs, tar):
             if tar_shape[0]:
                 # Boites englobantes
                 x_diff = (tar_shape[1] - pred_shape[1]) ** 2
                 y_diff = (tar_shape[2] - pred_shape[2]) ** 2
-                s_diff = (tar_shape[3] - pred_shape[3]) ** 2
+                s_diff = (torch.sqrt(tar_shape[3]) - torch.sqrt(pred_shape[3])) ** 2
                 l_box += x_diff + y_diff + 2 * s_diff
 
                 iou_shape = compute_iou(pred_shape[1:-1], tar_shape[1:-1])
@@ -236,7 +280,7 @@ def DetectionNetworkLoss(prediction, target):
             else:
                 l_conf_no_obj += nn.BCELoss(pred_shape[0], 0)
 
-        l_class = nn.BCELoss(pred[1], boxlet_target_array)
+        l_class = nn.BCELoss(pred[1], boxlet_target_array)  # TODO: Does this work?? Format of data??
 
         loss_total += 5 * l_box + l_conf_obj + 0.5 * l_conf_no_obj + l_class
 

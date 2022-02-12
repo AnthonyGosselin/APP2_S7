@@ -51,8 +51,7 @@ class ConveyorCnnTrainer():
         elif task == 'detection':
             model = DetectionNetwork(in_channels=1, n_params=3)
         elif task == 'segmentation':
-            # À compléter
-            raise NotImplementedError()
+            model = SegmentationNetwork(in_channels=1, n_classes=3)
         else:
             raise ValueError('Not supported task')
 
@@ -64,8 +63,7 @@ class ConveyorCnnTrainer():
         elif task == 'detection':
             loss_criterion = DetectionNetworkLoss
         elif task == 'segmentation':
-            # À compléter
-            raise NotImplementedError()
+            loss_criterion = torch.nn.CrossEntropyLoss(reduction='mean')
         else:
             raise ValueError('Not supported task')
 

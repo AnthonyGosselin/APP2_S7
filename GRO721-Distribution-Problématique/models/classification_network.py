@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-USE_ALEX = True
+USE_ALEX = False
 
 
 class ClassificationNetwork(nn.Module):
@@ -50,15 +50,6 @@ class ClassificationNetwork(nn.Module):
                 nn.ReLU(),
             )
             # 64 x 6 x 6
-
-            # in_channels = out_channels
-            # out_channels = 128
-            # self.conv3 = nn.Sequential(
-            #     nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
-            #     nn.BatchNorm2d(num_features=out_channels),
-            #     nn.ReLU(),
-            # )
-            # # 64 x 6 x 6
 
             in_channels = out_channels
             out_channels = 64
@@ -184,7 +175,6 @@ class ClassificationNetwork(nn.Module):
 
             x = self.conv1(x)
             x = self.conv2(x)
-            # x = self.conv3(x)
 
             x = self.conv_rel_max3(x)
 

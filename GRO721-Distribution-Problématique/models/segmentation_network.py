@@ -10,68 +10,86 @@ class SegmentationNetwork(nn.Module):
         self.hidden = 32  # ???
 
         # Down 1
-        self.conv_1_1 = nn.Conv2d(in_channels=in_channels, out_channels=32, kernel_size=3, padding=1, stride=1)
+        out_channels = 8
+        self.conv_1_1 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_1_1 = nn.ReLU()
-        self.conv_1_2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1, stride=1)
+        self.conv_1_2 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_1_2 = nn.ReLU()
 
         # Down 2
+        in_channels = out_channels
+        out_channels = 16
         self.maxpool_2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv_2_1 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1, stride=1)
+        self.conv_2_1 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_2_1 = nn.ReLU()
-        self.conv_2_2 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1, stride=1)
+        self.conv_2_2 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_2_2 = nn.ReLU()
 
         # Down 3
+        in_channels = out_channels
+        out_channels = 32
         self.maxpool_3 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv_3_1 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1, stride=1)
+        self.conv_3_1 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_3_1 = nn.ReLU()
-        self.conv_3_2 = nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, padding=1, stride=1)
+        self.conv_3_2 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_3_2 = nn.ReLU()
 
         # Down 4
+        in_channels = out_channels
+        out_channels = 64
         self.maxpool_4 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv_4_1 = nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, padding=1, stride=1)
+        self.conv_4_1 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_4_1 = nn.ReLU()
-        self.conv_4_2 = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, padding=1, stride=1)
+        self.conv_4_2 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_4_2 = nn.ReLU()
 
         # Down 5
+        in_channels = out_channels
+        out_channels = in_channels
         self.maxpool_5 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv_5_1 = nn.Conv2d(in_channels=256, out_channels=512, kernel_size=3, padding=1, stride=1)
+        self.conv_5_1 = nn.Conv2d(in_channels=in_channels, out_channels=2*in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_5_1 = nn.ReLU()
-        self.conv_5_2 = nn.Conv2d(in_channels=512, out_channels=256, kernel_size=3, padding=1, stride=1)
+        self.conv_5_2 = nn.Conv2d(in_channels=2*out_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_5_2 = nn.ReLU()
 
         # Up 6
-        self.upsample_6 = nn.ConvTranspose2d(in_channels=256, out_channels=256, kernel_size=2, stride=2)
-        self.conv_6_1 = nn.Conv2d(in_channels=512, out_channels=256, kernel_size=3, padding=1, stride=1)
+        in_channels = out_channels
+        out_channels = 64
+        self.upsample_6 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=2, stride=2)
+        self.conv_6_1 = nn.Conv2d(in_channels=2*in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_6_1 = nn.ReLU()
-        self.conv_6_2 = nn.Conv2d(in_channels=256, out_channels=128, kernel_size=3, padding=1, stride=1)
+        self.conv_6_2 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_6_2 = nn.ReLU()
 
         # Up 7
-        self.upsample_7 = nn.ConvTranspose2d(in_channels=128, out_channels=128, kernel_size=2, padding=0, stride=2)
-        self.conv_7_1 = nn.Conv2d(in_channels=256, out_channels=128, kernel_size=3, padding=1, stride=1)
+        in_channels = out_channels
+        out_channels = 32
+        self.upsample_7 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=2, padding=0, stride=2)
+        self.conv_7_1 = nn.Conv2d(in_channels=2*in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_7_1 = nn.ReLU()
-        self.conv_7_2 = nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=1, stride=1)
+        self.conv_7_2 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_7_2 = nn.ReLU()
 
         # Up 8
-        self.upsample_8 = nn.ConvTranspose2d(in_channels=64, out_channels=64, kernel_size=2, padding=0, stride=2)
-        self.conv_8_1 = nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=1, stride=1)
+        in_channels = out_channels
+        out_channels = 16
+        self.upsample_8 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=2, padding=0, stride=2)
+        self.conv_8_1 = nn.Conv2d(in_channels=2*in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_8_1 = nn.ReLU()
-        self.conv_8_2 = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=1, stride=1)
+        self.conv_8_2 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
         self.relu_8_2 = nn.ReLU()
 
         # Up 9
-        self.upsample_9 = nn.ConvTranspose2d(in_channels=32, out_channels=32, kernel_size=2, padding=0, stride=2)
-        self.conv_9_1 = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=1, stride=1)
+        in_channels = out_channels
+        out_channels = 8
+        self.upsample_9 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=2, padding=0, stride=2)
+        self.conv_9_1 = nn.Conv2d(in_channels=2*in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_9_1 = nn.ReLU()
-        self.conv_9_2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1, stride=1)
+        self.conv_9_2 = nn.Conv2d(in_channels=in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_9_2 = nn.ReLU()
 
-        self.output_conv = nn.Conv2d(in_channels=self.hidden, out_channels=n_classes, kernel_size=1)
+        self.output_conv = nn.Conv2d(in_channels=out_channels, out_channels=n_classes, kernel_size=1)
+        self.softmax = nn.Softmax()
 
     def forward(self, x):
         # Down 1
@@ -144,5 +162,7 @@ class SegmentationNetwork(nn.Module):
         output = self.conv_9_2(output)
         output = self.relu_9_2(output)
         output = self.output_conv(output)
+
+        output = self.softmax(output)
 
         return output

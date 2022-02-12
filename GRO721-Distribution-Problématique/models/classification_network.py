@@ -8,76 +8,79 @@ USE_ALEX = True
 class ClassificationNetwork(nn.Module):
     def __init__(self, in_channels, n_classes):
         super(ClassificationNetwork, self).__init__()
+
+        class_network = 'AlexNet' if USE_ALEX else 'ResNet'
+        print(f'Using {class_network} for classification task.')
         
         if USE_ALEX:
             # 1 x 53 x 53
-            out_channels = 16
+            out_channels = 8
             self.conv_rel_max1 = nn.Sequential(
-                nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=5, stride=1, padding=2),
+                nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=7, stride=2, padding=2),
                 nn.BatchNorm2d(num_features=out_channels),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=2, padding=0, stride=2)
             )
-            # 16 x 26 x 26
+            # 8 x 13 x 13
 
             in_channels = out_channels
-            out_channels = 64
+            out_channels = 16
             self.conv_rel_max2 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=2, padding=0, stride=2)
             )
-            # 64 x 8 x 8
+            # 16 x 6 x 6
 
             in_channels = out_channels
-            out_channels = 128
+            out_channels = 32
             self.conv1 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
                 nn.ReLU(),
             )
-            # 128 x 8 x 8
+            # 64 x 6 x 6
 
             in_channels = out_channels
-            out_channels = 128
+            out_channels = 64
             self.conv2 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
                 nn.ReLU(),
             )
-            # 128 x 8 x 8
+            # 64 x 6 x 6
 
             in_channels = out_channels
-            out_channels = 128
+            out_channels = 64
             self.conv3 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
                 nn.ReLU(),
             )
-            # 128 x 8 x 8
+            # 64 x 6 x 6
 
             in_channels = out_channels
-            out_channels = 128
+            out_channels = 64
             self.conv_rel_max3 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=2, padding=0, stride=2)
             )
-            # 128 x 8 x 8
+            # 64 x 3 x 3
 
-            in_channels = out_channels
-            out_channels = in_channels / 2
+            in_channels = out_channels * 3 * 3
+            out_channels = int(in_channels / 4)
             self.fc_rel1 = nn.Sequential(
-                nn.Linear(in_channels * 8 * 8, out_channels),
+                nn.Linear(in_channels, out_channels),
                 nn.ReLU()
             )
             # 8192
 
             in_channels = out_channels
             out_channels = n_classes
-            self.fc1 = nn.Linear(in_channels * 8 * 8, out_channels)
+            self.fc1 = nn.Linear(in_channels, out_channels)
             # 3
 
             self.sigmoid = nn.Sigmoid()

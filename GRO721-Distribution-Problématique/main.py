@@ -49,7 +49,7 @@ class ConveyorCnnTrainer():
         if task == 'classification':
             model = ClassificationNetwork(in_channels=1, n_classes=3)
         elif task == 'detection':
-            model = DetectionNetwork(in_channels=1, n_params=3)
+            model = DetectionNetwork(in_channels=1, n_params=7)
         elif task == 'segmentation':
             model = SegmentationNetwork(in_channels=1, n_classes=3)
         else:

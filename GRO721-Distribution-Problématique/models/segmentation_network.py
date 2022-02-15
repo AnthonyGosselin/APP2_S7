@@ -55,7 +55,8 @@ class SegmentationNetwork(nn.Module):
         # Up 6
         in_channels = out_channels
         out_channels = 64
-        self.upsample_6 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=2, stride=2)
+        self.upsample_6 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels,
+                                             output_padding=1, kernel_size=2, stride=2)
         self.conv_6_1 = nn.Conv2d(in_channels=2*in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_6_1 = nn.ReLU()
         self.conv_6_2 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
@@ -64,7 +65,8 @@ class SegmentationNetwork(nn.Module):
         # Up 7
         in_channels = out_channels
         out_channels = 32
-        self.upsample_7 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=2, padding=0, stride=2)
+        self.upsample_7 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels,
+                                             output_padding=1, kernel_size=2, padding=0, stride=2)
         self.conv_7_1 = nn.Conv2d(in_channels=2*in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_7_1 = nn.ReLU()
         self.conv_7_2 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
@@ -73,7 +75,8 @@ class SegmentationNetwork(nn.Module):
         # Up 8
         in_channels = out_channels
         out_channels = 16
-        self.upsample_8 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=2, padding=0, stride=2)
+        self.upsample_8 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels,
+                                             output_padding=1, kernel_size=2, padding=0, stride=2)
         self.conv_8_1 = nn.Conv2d(in_channels=2*in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_8_1 = nn.ReLU()
         self.conv_8_2 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1, stride=1)
@@ -82,7 +85,8 @@ class SegmentationNetwork(nn.Module):
         # Up 9
         in_channels = out_channels
         out_channels = 8
-        self.upsample_9 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=2, padding=0, stride=2)
+        self.upsample_9 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels,
+                                             output_padding=1, kernel_size=2, padding=0, stride=2)
         self.conv_9_1 = nn.Conv2d(in_channels=2*in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)
         self.relu_9_1 = nn.ReLU()
         self.conv_9_2 = nn.Conv2d(in_channels=in_channels, out_channels=in_channels, kernel_size=3, padding=1, stride=1)

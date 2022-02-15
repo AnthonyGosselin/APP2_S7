@@ -98,8 +98,8 @@ class Visualizer:
         ax1.set_title('Groundtruth')
         ax2.imshow(image[0], cmap='gray', vmax=1)
         ax2.set_title('Prediction')
-        ax1.patches = []
-        ax2.patches = []
+        # ax1.patches = []
+        # ax2.patches = []
         custom_lines = [Line2D([0], [0], color='r', lw=2),
                         Line2D([0], [0], color='g', lw=2),
                         Line2D([0], [0], color='b', lw=2)]

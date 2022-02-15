@@ -120,7 +120,7 @@ class Visualizer:
                 pos_x = prediction[i, 1] * image[0].shape[0]
                 pos_y = prediction[i, 2] * image[0].shape[0]
                 size = prediction[i, 3] * int(0.75 * image[0].shape[0] / 2)
-                class_index = int(np.argmax(prediction[i, 4:]))
+                class_index = i  # int(np.argmax(prediction[i, 4:]))
                 rec = patches.RegularPolygon((pos_x, pos_y), 4, orientation=0.78, radius=size, linewidth=2,
                                              edgecolor=color[class_index], facecolor='none')
                 ax2.add_patch(rec)

@@ -248,7 +248,8 @@ class SegmentationIntersectionOverUnionMetric(Metric):
 
 def segmentation_intersection_over_union(prediction, target, background_class):
     C = prediction.shape[1]
-
+    intersection = 0.0
+    union = 0.0
     predicted_segmentation = np.argmax(prediction, axis=1)
 
     for c in range(C):
@@ -258,7 +259,7 @@ def segmentation_intersection_over_union(prediction, target, background_class):
         predicted_mask = predicted_segmentation == c
         target_mask = target == c
 
-        intersection = (predicted_mask * target_mask).sum()
-        union = predicted_mask.sum() + target_mask.sum() - intersection
+        intersection += (predicted_mask * target_mask).sum()
+        union += predicted_mask.sum() + target_mask.sum() - (predicted_mask * target_mask).sum()
 
     return intersection, union

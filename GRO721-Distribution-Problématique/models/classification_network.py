@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-USE_ALEX = False
+# --lr 7.5e-4
+USE_ALEX = True
 
 
 class ClassificationNetwork(nn.Module):
@@ -14,7 +15,7 @@ class ClassificationNetwork(nn.Module):
         
         if USE_ALEX:
             # 1 x 53 x 53
-            out_channels = 16
+            out_channels = 32
             self.conv_rel_max1 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=7, stride=2, padding=2),
                 nn.BatchNorm2d(num_features=out_channels),
@@ -24,35 +25,16 @@ class ClassificationNetwork(nn.Module):
             # 8 x 13 x 13
 
             in_channels = out_channels
-            out_channels = 32
+            out_channels = 64
             self.conv_rel_max2 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=2, padding=0, stride=2)
             )
-            # 16 x 6 x 6
-
-            in_channels = out_channels
-            out_channels = 64
-            self.conv1 = nn.Sequential(
-                nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
-                nn.BatchNorm2d(num_features=out_channels),
-                nn.ReLU(),
-            )
-            # 64 x 6 x 6
 
             in_channels = out_channels
             out_channels = 128
-            self.conv2 = nn.Sequential(
-                nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
-                nn.BatchNorm2d(num_features=out_channels),
-                nn.ReLU(),
-            )
-            # 64 x 6 x 6
-
-            in_channels = out_channels
-            out_channels = 64
             self.conv_rel_max3 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
@@ -173,8 +155,8 @@ class ClassificationNetwork(nn.Module):
             x = self.conv_rel_max1(x)
             x = self.conv_rel_max2(x)
 
-            x = self.conv1(x)
-            x = self.conv2(x)
+            # x = self.conv1(x)
+            # x = self.conv2(x)
 
             x = self.conv_rel_max3(x)
 

@@ -51,7 +51,7 @@ class ConveyorCnnTrainer():
         elif task == 'detection':
             model = DetectionNetwork(in_channels=1, n_params=7)
         elif task == 'segmentation':
-            model = SegmentationNetwork(in_channels=1, n_classes=3)
+            model = SegmentationNetwork(in_channels=1, n_classes=3+1)
         else:
             raise ValueError('Not supported task')
 
@@ -113,6 +113,8 @@ class ConveyorCnnTrainer():
             test_loss, test_metric.get_name(), test_metric.get_value()))
 
         prediction = self._model(image)
+        rand = np.random.randint(0, len(image))
+        visualizer.show_prediction(image[rand], prediction[rand], segmentation_target[rand], boxes[rand], class_labels[rand])
 
         for i in range(len(image)):
             visualizer.show_prediction(image[i], prediction[i], segmentation_target[i], boxes[i], class_labels[i])
@@ -215,9 +217,12 @@ class ConveyorCnnTrainer():
                                             epochs_train_metrics, epochs_validation_metrics,
                                             train_metric.get_name())
 
-        ans = input('Do you want to test? (y/n):')
-        if ans == 'y':
-            self.test()
+        while True:
+            ans = input('Do you want to test? (y/n):')
+            if ans == 'y':
+                self.test()
+            else:
+                break
 
     def _train_batch(self, task, model, criterion, metric, optimizer, image, segmentation_target, boxes, class_labels):
         """

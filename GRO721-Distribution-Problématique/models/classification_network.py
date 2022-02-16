@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# --lr 7.5e-4
+# --lr 5e-4
 USE_ALEX = True
 
 
@@ -100,15 +100,15 @@ class ClassificationNetwork(nn.Module):
                 nn.BatchNorm2d(num_features=out_channels),
                 nn.ReLU(),
             )
-            # 128 x 13 x 13I
+            # 128 x 13 x 13
 
             self.res_conv2 = nn.Sequential(
-                nn.Conv2d(in_channels=in_channels, out_channels=128, kernel_size=3, stride=2, padding=1),
-                nn.BatchNorm2d(num_features=128),
+                nn.Conv2d(in_channels=in_channels, out_channels=96, kernel_size=3, stride=2, padding=1),
+                nn.BatchNorm2d(num_features=96),
             )
 
             in_channels = out_channels
-            out_channels = 64
+            out_channels = 96
             self.conv4 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=2, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
@@ -117,7 +117,7 @@ class ClassificationNetwork(nn.Module):
             # 64 x 7 x 7
 
             in_channels = out_channels
-            out_channels = 32
+            out_channels = 64
             self.conv5 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),
@@ -145,14 +145,12 @@ class ClassificationNetwork(nn.Module):
             self.fc = nn.Linear(in_features=(out_channels*1*1), out_features=n_classes)
             self.sigmoid1 = nn.Sigmoid()
 
-
     def forward(self, x):
 
         if USE_ALEX:
             # Get characteristics
             x = self.conv_rel_max1(x)
             x = self.conv_rel_max2(x)
-
             x = self.conv_rel_max3(x)
 
             # Flatten

@@ -110,7 +110,7 @@ class ClassificationNetwork(nn.Module):
             )
 
             in_channels = out_channels
-            out_channels = 128
+            out_channels = 64
             self.conv4 = nn.Sequential(
                 nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=2, padding=1),
                 nn.BatchNorm2d(num_features=out_channels),

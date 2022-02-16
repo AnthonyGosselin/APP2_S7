@@ -17,29 +17,30 @@ class DetectionNetwork(nn.Module):
         # 1 x 53 x 53
         out_channels = 32
         self.conv_rel_max1 = nn.Sequential(
-            nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=7, stride=2, padding=2),
+            nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=7, stride=1, padding=2),
             nn.BatchNorm2d(num_features=out_channels),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, padding=0, stride=2)
         )
-        # 16 x 13 x 13
+        # 16 x 26 x 26
 
         in_channels = out_channels
-        out_channels = 64
+        out_channels = 128
         self.conv_rel_max2 = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(num_features=out_channels),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, padding=0, stride=2)
         )
-        # 32 x 6 x 6
+        # 32 x 13 x 13
 
         in_channels = out_channels
-        out_channels = 96
+        out_channels = 128
         self.conv1 = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(num_features=out_channels),
             nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, padding=0, stride=2)
         )
         # 64 x 6 x 6
 
@@ -52,24 +53,6 @@ class DetectionNetwork(nn.Module):
             nn.MaxPool2d(kernel_size=2, padding=0, stride=2)
         )
         # 128 x 3 x 3
-
-        in_channels = out_channels
-        out_channels = 128
-        self.conv3 = nn.Sequential(
-            nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(num_features=out_channels),
-            nn.ReLU()
-        )
-        # 64 x 3 x 3
-
-        # in_channels = out_channels
-        # out_channels = 64
-        # self.conv_rel_max3 = nn.Sequential(
-        #     nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
-        #     nn.BatchNorm2d(num_features=out_channels),
-        #     nn.ReLU(),
-        # )
-        # # 32 x 3 x 3
 
         # FORK into two linear layers
         in_channels = out_channels
@@ -96,7 +79,7 @@ class DetectionNetwork(nn.Module):
         # END: box branch ----------
 
         # Head for classes
-        in_channels = 64
+        in_channels = 128
         out_channels = 16
         self.fc_conv_class1 = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1),
@@ -128,9 +111,6 @@ class DetectionNetwork(nn.Module):
 
         x = self.conv1(x)
         x = self.conv2(x)
-        x = self.conv3(x)
-
-        # x = self.conv_rel_max3(x)
 
         # Fork
         out1 = self.fc_conv_box1(x)
@@ -205,7 +185,7 @@ def DetectionNetworkLoss(prediction, target):
             else:
                 l_conf_no_obj += F.binary_cross_entropy(pred_shape[0], tar_shape[0])
 
-        t = tar[:, 4].long()
+        t = sorted_target[:, 4].long()
         l_class = F.cross_entropy(pred[:, 4:], t)
 
         loss_total += 10 * l_box + 0.5 * l_conf_obj + 0.5 * l_conf_no_obj + l_class

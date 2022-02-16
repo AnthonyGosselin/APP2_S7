@@ -98,8 +98,6 @@ class Visualizer:
         ax1.set_title('Groundtruth')
         ax2.imshow(image[0], cmap='gray', vmax=1)
         ax2.set_title('Prediction')
-        # ax1.patches = []
-        # ax2.patches = []
         custom_lines = [Line2D([0], [0], color='r', lw=2),
                         Line2D([0], [0], color='g', lw=2),
                         Line2D([0], [0], color='b', lw=2)]
@@ -120,7 +118,7 @@ class Visualizer:
                 pos_x = prediction[i, 1] * image[0].shape[0]
                 pos_y = prediction[i, 2] * image[0].shape[0]
                 size = prediction[i, 3] * int(0.75 * image[0].shape[0] / 2)
-                class_index = i  # int(np.argmax(prediction[i, 4:]))
+                class_index = int(np.argmax(prediction[i, 4:]))
                 rec = patches.RegularPolygon((pos_x, pos_y), 4, orientation=0.78, radius=size, linewidth=2,
                                              edgecolor=color[class_index], facecolor='none')
                 ax2.add_patch(rec)

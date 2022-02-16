@@ -80,7 +80,7 @@ class ConveyorCnnTrainer():
             raise ValueError('Not supported task')
 
     def test(self):
-        params_test = {'batch_size': self._args.batch_size, 'shuffle': False, 'num_workers': 4}
+        params_test = {'batch_size': self._args.batch_size, 'shuffle': False, 'num_workers': 4, 'drop_last': True}
 
         dataset_test = ConveyorSimulator(self._test_data_path, self.transform)
         test_loader = torch.utils.data.DataLoader(dataset_test, **params_test)
@@ -94,6 +94,7 @@ class ConveyorCnnTrainer():
         self._model.eval()
 
         test_loss = 0
+        test_losses = []
         with torch.no_grad():
             for image, segmentation_target, boxes, class_labels in test_loader:
                 image = image.to(self._device)
@@ -103,14 +104,23 @@ class ConveyorCnnTrainer():
 
                 loss = self._test_batch(self._args.task, self._model, self._criterion, test_metric,
                                         image, segmentation_target, boxes, class_labels)
+                test_losses.append(loss.item())
                 test_loss += loss.item()
 
         test_loss /= len(dataset_test)
+        test_losses = [t / len(dataset_test) for t in test_losses]
         print('Test - Average loss: {:.6f}, {}: {:.6f}'.format(
             test_loss, test_metric.get_name(), test_metric.get_value()))
 
         prediction = self._model(image)
-        visualizer.show_prediction(image[0], prediction[0], segmentation_target[0], boxes[0], class_labels[0])
+
+        for i in range(len(image)):
+            visualizer.show_prediction(image[i], prediction[i], segmentation_target[i], boxes[i], class_labels[i])
+            print("Loss:", test_losses[i])
+            ans = input('New test? (y/n):')
+            if ans == 'n':
+                break
+
 
     def train(self):
         epochs_train_losses = []

@@ -59,7 +59,7 @@ class ConveyorCnnTrainer():
 
     def _create_criterion(self, task):
         if task == 'classification':
-            loss_criterion = torch.nn.CrossEntropyLoss(reduction='mean')
+            loss_criterion = torch.nn.BCELoss(reduction='mean')
         elif task == 'detection':
             loss_criterion = DetectionNetworkLoss
         elif task == 'segmentation':

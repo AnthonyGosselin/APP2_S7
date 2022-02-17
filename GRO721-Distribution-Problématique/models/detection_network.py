@@ -97,7 +97,6 @@ class DetectionNetwork(nn.Module):
         )
         # Output 2: 3 x 3 x 1
         # Reshape: 3 x 3
-        self.sigmoid_class = nn.Sigmoid()
 
         # END: class branch -----------
 
@@ -123,7 +122,6 @@ class DetectionNetwork(nn.Module):
         out2 = self.fc_conv_class1(x)
         out2 = self.fc_conv_class2(out2)
         out2 = out2.view(-1, 3, 3)
-        out2 = self.sigmoid_class(out2)
 
         # Concat output
         output = torch.cat((out1, out2), dim=2)
@@ -190,6 +188,6 @@ def DetectionNetworkLoss(prediction, target):
         t = sorted_target[:, 4].long()
         l_class = F.cross_entropy(pred[:, 4:], t)
 
-        loss_total += 40 * l_box + l_conf_obj + l_conf_no_obj + l_class
+        loss_total += 75 * l_box + l_conf_obj + 1.5 * l_conf_no_obj + 2 * l_class
 
     return loss_total
